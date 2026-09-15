@@ -1,0 +1,14 @@
+{
+	"name": "preproyecto-nodejs",
+	"version": "1.0.0",
+	"description": "Entrega pre-proyecto. Curso NodeJS",
+	"license": "MIT",
+	"author": "Jonhy Sanchez",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js",
+		"dev": "node --watch index.js",
+		"test": "test"
+	}
+}
