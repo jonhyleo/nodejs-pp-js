@@ -2,6 +2,19 @@ const BASE_URL = "https://fakestoreapi.com";
 
 const [, , cliMethod, cliResource, ...cliExtraArgs] = process.argv;
 
+// Helper para imprimir datos en formato de tabla
+function printTable(data) {
+	const columns = ["id", "title", "price", "category"];
+
+	if (Array.isArray(data)) {
+		console.table(data, columns);
+	} else if (typeof data === "object" && data !== null) {
+		console.table([data], columns);
+	} else {
+		console.log(data);
+	}
+}
+
 async function executeCommand(method, resource, extraArgs) {
 	if (!method || !resource) {
 		console.log("⚠️ Error: Comando incompleto. Formato: <METHOD> <resource> [args]");
@@ -15,7 +28,8 @@ async function executeCommand(method, resource, extraArgs) {
 		if (uppercaseMethod === "GET" && resource.startsWith("products")) {
 			const response = await fetch(`${BASE_URL}/${resource}`);
 			const data = await response.json();
-			console.log("\n📦 Respuesta:", data);
+			console.log("\n📦 Respuesta:");
+			printTable(data);
 		}
 
 		// 2. POST Crear un nuevo producto (products <title> <price> <category>)
@@ -41,7 +55,8 @@ async function executeCommand(method, resource, extraArgs) {
 				body: JSON.stringify(newProduct),
 			});
 			const data = await response.json();
-			console.log("\n✅ Producto Creado correctamente:", data);
+			console.log("\n✅ Producto Creado correctamente:");
+			printTable(data);
 		}
 
 		// 3. DELETE Borrar producto por ID (products/:id)
@@ -50,7 +65,8 @@ async function executeCommand(method, resource, extraArgs) {
 				method: "DELETE",
 			});
 			const data = await response.json();
-			console.log("\n🗑️ Producto Eliminado correctamente:", data);
+			console.log("\n🗑️ Producto Eliminado correctamente:");
+			printTable(data);
 		} else {
 			console.log("❌ Comando no reconocido o formato incorrecto.");
 		}
