@@ -16,6 +16,41 @@ async function executeCommand(method, resource, extraArgs) {
 			const response = await fetch(`${BASE_URL}/${resource}`);
 			const data = await response.json();
 			console.log("\n📦 Respuesta:", data);
+		}
+
+		// 2. POST Crear un nuevo producto (products <title> <price> <category>)
+		else if (uppercaseMethod === "POST" && resource === "products") {
+			const [title, price, category] = extraArgs;
+
+			if (!title || !price || !category) {
+				console.log("⚠️ Error: Para POST ingresá: POST products <title> <price> <category>");
+				return;
+			}
+
+			const newProduct = {
+				title,
+				price: Number(price),
+				category,
+				description: "Producto creado desde la consola",
+				image: "https://placehold.co/600x600",
+			};
+
+			const response = await fetch(`${BASE_URL}/products`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(newProduct),
+			});
+			const data = await response.json();
+			console.log("\n✅ Producto Creado correctamente:", data);
+		}
+
+		// 3. DELETE Borrar producto por ID (products/:id)
+		else if (uppercaseMethod === "DELETE" && resource.startsWith("products/")) {
+			const response = await fetch(`${BASE_URL}/${resource}`, {
+				method: "DELETE",
+			});
+			const data = await response.json();
+			console.log("\n🗑️ Producto Eliminado correctamente:", data);
 		} else {
 			console.log("❌ Comando no reconocido o formato incorrecto.");
 		}
