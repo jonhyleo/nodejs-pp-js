@@ -1,8 +1,10 @@
+import readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
+
 const BASE_URL = "https://fakestoreapi.com";
 
 const [, , cliMethod, cliResource, ...cliExtraArgs] = process.argv;
 
-// Helper para imprimir datos en formato de tabla
 function printTable(data) {
 	const columns = ["id", "title", "price", "category"];
 
@@ -24,16 +26,12 @@ async function executeCommand(method, resource, extraArgs) {
 	try {
 		const uppercaseMethod = method.toUpperCase();
 
-		// 1. GET Obtener productos u obtener productos por ID (products/:id)
 		if (uppercaseMethod === "GET" && resource.startsWith("products")) {
 			const response = await fetch(`${BASE_URL}/${resource}`);
 			const data = await response.json();
 			console.log("\n📦 Respuesta:");
 			printTable(data);
-		}
-
-		// 2. POST Crear un nuevo producto (products <title> <price> <category>)
-		else if (uppercaseMethod === "POST" && resource === "products") {
+		} else if (uppercaseMethod === "POST" && resource === "products") {
 			const [title, price, category] = extraArgs;
 
 			if (!title || !price || !category) {
@@ -57,10 +55,7 @@ async function executeCommand(method, resource, extraArgs) {
 			const data = await response.json();
 			console.log("\n✅ Producto Creado correctamente:");
 			printTable(data);
-		}
-
-		// 3. DELETE Borrar producto por ID (products/:id)
-		else if (uppercaseMethod === "DELETE" && resource.startsWith("products/")) {
+		} else if (uppercaseMethod === "DELETE" && resource.startsWith("products/")) {
 			const response = await fetch(`${BASE_URL}/${resource}`, {
 				method: "DELETE",
 			});
@@ -78,9 +73,21 @@ async function executeCommand(method, resource, extraArgs) {
 async function main() {
 	if (cliMethod && cliResource) {
 		await executeCommand(cliMethod, cliResource, cliExtraArgs);
-	} else {
-		console.log("Por favor ingresa un comando válido.");
+		return;
 	}
+
+	// Inicialización de la interfaz interactiva
+	const rl = readline.createInterface({ input, output });
+
+	console.log("==================================================");
+	console.log("🚀 Modo Interactivo Listo (process.argv está vacío)");
+	console.log('Escribí tu comando (ej: GET products/15) o "exit" para salir.');
+	console.log("==================================================\n");
+
+	const inputCommand = await rl.question("FakeStore-CLI> ");
+	const [method, resource, ...extraArgs] = inputCommand.trim().split(" ");
+	await executeCommand(method, resource, extraArgs);
+	rl.close();
 }
 
 main();
